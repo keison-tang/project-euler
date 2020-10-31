@@ -25,23 +25,74 @@ Factors are divisors but not all divisors are factors.
 
 #include <iostream>
 #include <math.h>
+#include <map>
+
+/*
+    Returns true if the number is a prime number
+*/
+bool IsPrime(int number) {
+    if (number <= 3) {
+        return (number > 1);   // 2 and 3 is prime
+    } else if (((number % 2) == 0) || ((number % 3) == 0)) {
+        return false;   // divisible by 2 or 3 not primeFactors
+    }
+
+    int i = 5;
+
+    while ((i * i) <= number) {
+        if (((number % i) == 0) || ((number % (i + 2)) == 0)) {
+            return false;
+        }
+        i += 6;
+    }
+
+    return true;
+}
 
 /*
     Returns number of factors for an input number
     @param  num Number to check
     @return Number of factors for specified number
 */
-int numFactors(int num) {
+int NumFactors(int num) {
     if (num == 1) { // 1 only has 1 factor
         return 1;
     }
-    
-    int factors = 2;  // starting from 2, every number has at least 2 factors, 1 and itself
-    
-    for (int i = 2; i <= (num / 2); i++) { // only check up to half of specified number
-        if ((num % i) == 0) {
-            factors++;
+
+    //prime factorisation - division method
+    std::map<int, int> primeFactors;    //key: prime factor, value: exponent
+
+    int tmp = num;
+
+    while (tmp != 1) {
+        int i = 2;
+        int primeDivisor;
+
+        while (1) { // find smallest prime factor
+            if (((tmp % i) == 0) && (IsPrime(i))) {
+                primeDivisor = i;
+                break;
+            }
+
+            i++;
         }
+
+        std::map<int, int>::iterator it = primeFactors.find(primeDivisor);
+
+        if (it != primeFactors.end()) {   // found, iterate exponent
+            it -> second += 1;
+        } else {    // not found, create pair
+            primeFactors.insert(std::pair<int, int>(primeDivisor, 1));
+        }
+
+        tmp /= primeDivisor;
+    }
+
+    // number of factors = multiply together each (exponent + 1)
+    int factors = 1;
+
+    for (const auto& pair : primeFactors) { //ref to avoid copying
+        factors *= pair.second + 1; 
     }
 
     return factors;
@@ -57,14 +108,12 @@ int main() {
 
         sum+= triNumIndex;
 
-        factors = numFactors(sum);
+        factors = NumFactors(sum);
 
         //std::cout << "trinum: " << triNumIndex << " " << sum << " " << factors << std::endl;
     }
 
     std::cout << "trinum: " << triNumIndex << " " << sum << " " << factors << std::endl;
-
-    // trinumindex 12375 sum 76576500 factors 576
 
     return 0;
 }
