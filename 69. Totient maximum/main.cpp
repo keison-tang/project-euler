@@ -86,7 +86,7 @@ int TotientFunction(int n) {
         tmp /= primeDivisor;
     }
 
-    // phi(n) = multiply together each (exponent + 1)
+    // phi(n) = product of each (prime - 1) * prime^(exponent - 1)
     int product = 1;
 
     for (const auto& pair : primeFactors) { //ref to avoid copying
