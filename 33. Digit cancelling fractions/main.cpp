@@ -26,8 +26,8 @@ bool DigitCancelFraction(int numerator, int denominator) {
     if ((denominator < 10) || (denominator > 99)) return false; //2 digit denominator
     if ((numerator % 10 == 0) || (denominator % 10 == 0)) return false; //no trivial example
 
-    float orig = (float)numerator / denominator;
-    float canc = 0;
+    float before = (float)numerator / denominator;
+    float after = 0;
 
     std::string numStr, denStr;
 
@@ -39,22 +39,20 @@ bool DigitCancelFraction(int numerator, int denominator) {
 
     if (numStr == denStr) return false; //only one digit is common across both nums
 
-    //cancel the common digit and compare
+    //cancel the common digit and calculate new fraction
     if (numStr[0] == denStr[0]) {
-        canc = (float)(numStr[1] - '0') / (denStr[1] - '0'); //char - '0' converts to int
-        return (orig == canc);
+        after = (float)(numStr[1] - '0') / (denStr[1] - '0'); //char - '0' converts to int
     } else if (numStr[0] == denStr[1]) {
-        canc = (float)(numStr[1] - '0') / (denStr[0] - '0');
+        after = (float)(numStr[1] - '0') / (denStr[0] - '0');
     } else if (numStr[1] == denStr[0]) {
-        canc = (float)(numStr[0] - '0') / (denStr[1] - '0');
-        return (orig == canc);
+        after = (float)(numStr[0] - '0') / (denStr[1] - '0');
     } else if (numStr[1] == denStr[1]) {
-        canc = (float)(numStr[0] - '0') / (denStr[0] - '0');
+        after = (float)(numStr[0] - '0') / (denStr[0] - '0');
     } else {
-        return false;
+        return false;   //no common digit
     }
 
-    return (orig == canc);
+    return (before == after);
 }
 
 int main() {
