@@ -11,8 +11,8 @@ Find the sum of all the positive integers which cannot be written as the sum of 
 */
 
 #include <iostream>
-#include <vector>
 #include <set>
+#include <cmath>
 
 /*
 Figures out if a number is an abundant number: where sum of proper divisors exceed the number
@@ -20,12 +20,17 @@ Figures out if a number is an abundant number: where sum of proper divisors exce
 @returns True if the number is abundant, else false
 */
 bool IsAbundantNum(int num) {
-    int sum = 0;
+    int sum = 1;    //start at 1 to exclude the number itself as it's not proper divisor
 
     // sum proper divisors
-    for (int i = 1; i < num / 2 + 1; i++) { 
+    for (int i = 2; i <= sqrt(num); i++) {  //up to sqrt(num) as divisors come in pairs
         if (num % i == 0 ) {
-            sum += i;
+            if ((num / i) == i) { // divisor is sqrt(num), add divisor once
+                sum += i;   
+            } else {    // add divisor pair
+                sum += i;
+                sum += num / i;
+            }
         }
     }
     
@@ -35,32 +40,27 @@ bool IsAbundantNum(int num) {
 int main() {
     int sum = 0;
 
-    std::vector<int> abundantNums;
-    std::vector<int>::iterator first, second;
+    std::set<int>::iterator it;
 
-    std::set<int> sumCombinations;  //use set because no duplicates allowed
+    std::set<int> abundantNums;  //use set because no duplicates allowed
 
     // find all abundant nums in range
     for (int i = 1; i <= 28123; i++) {
         sum += i;   // assume all numbers can't be written as sum of 2 abundants - see why later 
-        
+
         if (IsAbundantNum(i)) {
-            abundantNums.push_back(i);
+            abundantNums.insert(i);
         }
     }
 
-    // find all combinations of two abundant nums and insert into set
-    for (first = abundantNums.begin(); first < abundantNums.end(); first++) {
-        for (second = first; second < abundantNums.end(); second++) {
-            if ((*first + *second) <= 28123) {
-                sumCombinations.insert(*first + *second);
+    // check if num - abundant = abundant
+    for (int i = 1; i <= 28123; i++) {
+        for (it = abundantNums.begin(); it != abundantNums.end(); it++) { 
+            if (abundantNums.find(i - *it) != abundantNums.end()) {
+                sum -= i;   //can be written as sum of 2 abundants, subtract from sum
+                break;
             }
         }
-    }
-
-    // subtract each unique combination from the sum
-    for (auto comb : sumCombinations) {
-        sum -= comb;
     }
 
     std::cout << sum << std::endl;
