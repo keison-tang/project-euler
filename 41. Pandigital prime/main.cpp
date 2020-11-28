@@ -52,11 +52,18 @@ bool IsPandigital(int num) {
 int main() {
     unsigned long long largest = 0, i;
 
-    for (i = 987654321; i > 0; i -= 2) {
+    /*
+    Using divisibility rules: 
+    A number is divisible by 3 if the sum of digits can be divided by 3
+    If a number is divisible by 3 it can't be prime
+    Sum of 1-9 = 45, % 3 = 0
+    Sum of 1-8 = 36, % 3 = 0
+    Therefore max pandigital prime consists of digits 1-7
+    */
+    for (i = 7654321; i > 0; i -= 2) {
         if (IsPandigital(i)) {
             if (IsPrime(i)) {
                 largest = i;
-                std::cout << largest << std::endl;
                 break;
             }
         }
