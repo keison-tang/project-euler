@@ -13,7 +13,6 @@ How many fractions lie between 1/3 and 1/2 in the sorted set of reduced proper f
 */
 
 #include <iostream>
-#include <set>
 
 /*
 Struct for a fraction, n numerator, d denominator
@@ -40,7 +39,7 @@ Implements Euclid's Algorithm for finding gcd of two integers
 @returns GCD of integers a and b
 */
 int GCD(int a, int b) {
-    int larger, smaller, division, remainder = 1;
+    int larger, smaller, remainder = 1;
 
     if (a == 0) {
         return b;
@@ -59,9 +58,7 @@ int GCD(int a, int b) {
     }
     
     while (remainder != 0) {
-        division = larger / smaller;
         remainder = larger % smaller;
-
         larger = smaller;
         smaller = remainder;
     }
@@ -72,37 +69,47 @@ int GCD(int a, int b) {
 /*
 Simplifies a fraction by dividing numerator and denominator by their gcd
 */
-fraction SimplifyFraction(fraction f) {
-    fraction simple;
-    
+void SimplifyFraction(fraction& f) {
     int gcd = GCD(f.n, f.d);
     
-    simple.n = f.n / gcd;
-    simple.d = f.d / gcd;
-
-    return simple;
+    f.n /= gcd;
+    f.d /= gcd;
 } 
+
+/*
+Returns true if the fraction cannot be simplified
+*/
+bool IsIrreducableFraction(const fraction& f) {
+    return GCD(f.n, f.d) == 1;
+}
 
 int main() {
 
     fraction f;
-    std::set<fraction> fractions; //unique and ordered set
+    int cnt = 0;
+
+    double lb, ub, dec;
+    lb = 1.0 / 3.0;
+    ub = 1.0 / 2.0;
 
     for (int d = 1; d <= 12000; d++) {
-        for (int n = 1; n <= (d/2 + 1); n++) { //check numerators up to 1/2
-            if ((((double)n / (double)d) < (1.0 / 2.0)) 
-            && (((double)n / (double)d) > (1.0 / 3.0))) { //only add to set if <1/2 and >1/3
+        for (int n = (d/3 -1); n <= (d/2 + 1); n++) { //check numerators between 1/3 to 1/2
+
+            dec = (double)n / (double)d;
+
+            if ((dec > lb) && (dec < ub)) { //if <1/2 and >1/3
                 f.n = n;
                 f.d = d;
 
-                f = SimplifyFraction(f);
-
-                fractions.insert(f);
+                //if fraction can be reduced then its already been counted before
+                if (IsIrreducableFraction(f)) {
+                    cnt++;
+                }
             }      
         }
     }
 
-    std::cout << fractions.size() << std::endl;
+    std::cout << cnt << std::endl;
 
     return 0;
 }
